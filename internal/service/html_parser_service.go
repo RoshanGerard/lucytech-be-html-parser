@@ -165,6 +165,16 @@ func (service *HTMLParserService) countLinks() (int, int) {
 	return internalLinks, externalLinks
 }
 
+func (service *HTMLParserService) isLoginPage() bool {
+	doc := service.htmlDoc
+
+	usernameExists := doc.Find("input[type='text'], input[type='email'], input[name='username'], input[name='user'], input[name='login']").Length() > 0
+	passwordExists := doc.Find("input[type='password'], input[name='password'], input[name='pass']").Length() > 0
+	buttonExists := doc.Find("button[type='submit'], input[type='submit'], button[name='login']").Length() > 0
+
+	return usernameExists && passwordExists && buttonExists
+}
+
 func ParseHTML(url string) models.HtmlParseResponseDto {
 	service := HtmlParserConstruct(url)
 
@@ -180,6 +190,8 @@ func ParseHTML(url string) models.HtmlParseResponseDto {
 
 	internalLinks, externalLinks := service.countLinks()
 
+	isLoginPage := service.isLoginPage()
+
 	if err != nil {
 		fmt.Println("Error: ", err)
 	} else {
@@ -191,5 +203,6 @@ func ParseHTML(url string) models.HtmlParseResponseDto {
 		Version:       htmlVersion,
 		InternalLinks: internalLinks,
 		ExternalLinks: externalLinks,
+		IsLoginPage:   isLoginPage,
 	}
 }

@@ -1,6 +1,6 @@
 ## Introduction
 
-LucyTech's HTML Parser Server Practical Test
+LucyTech's HTML Parser Server Practical Test Backend
 
 This application is designed to efficiently crawl through the provided URL and extract essential information from the web page. The server is capable of parsing HTML content and provides the following information:
 

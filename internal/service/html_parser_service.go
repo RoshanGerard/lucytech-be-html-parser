@@ -6,7 +6,9 @@ import (
 	"github.com/chromedp/chromedp"
 	"golang.org/x/net/context"
 	"golang.org/x/net/html"
+	"log"
 	"lucytech/internal/models"
+	"net/http"
 	"net/url"
 	"strings"
 )
@@ -65,7 +67,18 @@ func (service *HTMLParserService) getHtmlContext(url string) (string, *goquery.D
 }
 
 func (service *HTMLParserService) getHtmlVersion() (string, error) {
-	doc := service.htmlDoc
+	// Note: HTML version determine not based on chromedp retrieved context, because it shed metadata required
+	// to detect HTML version.
+	resp, err := http.Get(service.url)
+
+	if err != nil {
+		log.Fatal("Failed to retrieve HTML document ", err)
+	}
+
+	defer resp.Body.Close()
+
+	// Determine HTML version.
+	doc, err := goquery.NewDocumentFromReader(resp.Body)
 
 	for n := doc.Nodes[0]; n != nil; n = n.NextSibling {
 		firstNode := n.FirstChild
@@ -75,10 +88,14 @@ func (service *HTMLParserService) getHtmlVersion() (string, error) {
 		}
 	}
 
-	return "Unknown", nil
+	if err != nil {
+		log.Fatal("Failed to determine HTML version ", err)
+	}
+
+	return "Unknown", err
 }
 
-func (service *HTMLParserService) getHtmlTitle(url string) (string, error) {
+func (service *HTMLParserService) getHtmlTitle() (string, error) {
 	doc := service.htmlDoc
 
 	title := doc.Find("title").Text()
@@ -159,7 +176,7 @@ func ParseHTML(url string) models.HtmlParseResponseDto {
 		fmt.Println("HTML Content", htmlVersion)
 	}
 
-	title, err := service.getHtmlTitle(service.url)
+	title, err := service.getHtmlTitle()
 
 	internalLinks, externalLinks := service.countLinks()
 

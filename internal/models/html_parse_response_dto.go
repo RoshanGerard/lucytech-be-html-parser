@@ -1,6 +1,8 @@
 package models
 
-type ResponseDto struct {
-	Title   string `json:"title"`
-	Version string `json:"version"`
+type HtmlParseResponseDto struct {
+	Title         string `json:"title"`
+	Version       string `json:"version"`
+	InternalLinks int    `json:"internalLinks"`
+	ExternalLinks int    `json:"externalLinks"`
 }

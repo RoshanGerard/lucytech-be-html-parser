@@ -6,6 +6,7 @@ import (
 	"github.com/chromedp/chromedp"
 	"golang.org/x/net/context"
 	"golang.org/x/net/html"
+	"lucytech/internal/models"
 	"net/url"
 	"strings"
 )
@@ -63,7 +64,7 @@ func (service *HTMLParserService) getHtmlContext(url string) (string, *goquery.D
 	return service.htmlContext, doc, nil
 }
 
-func (service *HTMLParserService) GetHtmlVersion(url string) (string, error) {
+func (service *HTMLParserService) getHtmlVersion() (string, error) {
 	doc := service.htmlDoc
 
 	for n := doc.Nodes[0]; n != nil; n = n.NextSibling {
@@ -77,7 +78,7 @@ func (service *HTMLParserService) GetHtmlVersion(url string) (string, error) {
 	return "Unknown", nil
 }
 
-func (service *HTMLParserService) GetHtmlTitle(url string) (string, error) {
+func (service *HTMLParserService) getHtmlTitle(url string) (string, error) {
 	doc := service.htmlDoc
 
 	title := doc.Find("title").Text()
@@ -147,10 +148,10 @@ func (service *HTMLParserService) countLinks() (int, int) {
 	return internalLinks, externalLinks
 }
 
-func ParseHTML(url string) (string, string) {
+func ParseHTML(url string) models.HtmlParseResponseDto {
 	service := HtmlParserConstruct(url)
 
-	htmlVersion, err := service.GetHtmlVersion(service.url)
+	htmlVersion, err := service.getHtmlVersion()
 
 	if err != nil {
 		fmt.Println("Error: ", err)
@@ -158,9 +159,9 @@ func ParseHTML(url string) (string, string) {
 		fmt.Println("HTML Content", htmlVersion)
 	}
 
-	title, err := service.GetHtmlTitle(service.url)
+	title, err := service.getHtmlTitle(service.url)
 
-	service.countLinks()
+	internalLinks, externalLinks := service.countLinks()
 
 	if err != nil {
 		fmt.Println("Error: ", err)
@@ -168,5 +169,10 @@ func ParseHTML(url string) (string, string) {
 		fmt.Println("HTML Content", title)
 	}
 
-	return title, htmlVersion
+	return models.HtmlParseResponseDto{
+		Title:         title,
+		Version:       htmlVersion,
+		InternalLinks: internalLinks,
+		ExternalLinks: externalLinks,
+	}
 }

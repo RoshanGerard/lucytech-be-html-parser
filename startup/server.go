@@ -7,25 +7,29 @@ import (
 	"net/http"
 )
 
+// CORS middleware function
+func enableCORS(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "http://localhost:5173")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+
+		// Handle preflight requests
+		if r.Method == http.MethodOptions {
+			w.WriteHeader(http.StatusNoContent)
+			return
+		}
+
+		next.ServeHTTP(w, r)
+	})
+}
+
 func Server() {
 	r := mux.NewRouter()
 
-	r.HandleFunc("/users/{id}", controller.GetUser).Methods("GET")
-
 	r.HandleFunc("/api/url-info", controller.GetHTMLContextMetadata).Methods("POST")
 
-	//mux.HandleFunc("GET /comment", func(w http.ResponseWriter, r *http.Request) {
-	//	fmt.Fprintf(w, "Return all the comments.")
-	//})
-	//
-	//mux.HandleFunc("POST /comment", func(w http.ResponseWriter, r *http.Request) {
-	//	fmt.Println(w, "Post a new comment.")
-	//})
+	crsRouter := enableCORS(r)
 
-	// or localhost:8080
-	//if err := http.ListenAndServe(":8080", mux); err != nil {
-	//	fmt.Println(err.Error())
-	//}
-
-	log.Fatal(http.ListenAndServe(":8080", r))
+	log.Fatal(http.ListenAndServe(":8080", crsRouter))
 }

@@ -11,6 +11,14 @@ This application is designed to efficiently crawl through the provided URL and e
 
 With these capabilities, our HTML Parser Server aims to simplify web scraping and data extraction tasks, making it a valuable tool for developers and analysts.
 
+## How to Run
+Run the main.go using ``go`` cli command.
+
+```shell
+cd ~/<project>
+go run ./cmd/main.go
+```
+
 ## Dependencies
 
 This project uses the following dependencies:

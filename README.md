@@ -8,6 +8,7 @@ This application is designed to efficiently crawl through the provided URL and e
 - **External Links**: Extracts and lists all external links leading to different domains.
 - **HTML Version**: Identifies and displays the HTML version used by the web page.
 - **Page Title**: Retrieves and shows the title of the web page.
+- **Login Page**: Detect login page.
 
 With these capabilities, our HTML Parser Server aims to simplify web scraping and data extraction tasks, making it a valuable tool for developers and analysts.
 
